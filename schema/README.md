@@ -51,7 +51,9 @@ GET /random
 
 which returns values like:
 
+```
 { "uuid": "200505-AE62-44ABB-83AFD", "value": 0.83028 }
+```
 
 The application also comes bundled with an aggregator script which aggregates logged records into metrics relevant to the application.
 
@@ -75,6 +77,7 @@ End Users enters into a contract with the Node Operator to access API, and can a
 
 ### Metadata - Registration
 
+```
 {
     "0":
         {
@@ -95,6 +98,7 @@ End Users enters into a contract with the Node Operator to access API, and can a
                 }
         }
 }
+```
 
 If replacing an older registration, an optional "reference" field can be added in the meta data request. This is a reference to the confirmation of the associated former registration.
 
@@ -102,6 +106,7 @@ This is used so that reporting on metrics across versions can occur.
 
 eg)
 
+```
 {
     "0":
         {
@@ -123,6 +128,7 @@ eg)
                 }
         }
 }
+```
 
 This transaction is made out to the API developer's wallet, and accompanied by an amount which has been agreed to between the developer and the node operator.
 
@@ -142,6 +148,7 @@ Only registrations which have a paired confirmation will be aggregateed when ass
 
 Confirmation meta data takes the form:
 
+```
 {
     "0": {
             "system": "croesus"
@@ -149,6 +156,7 @@ Confirmation meta data takes the form:
             ,"reference": "aaaad5222e1be60bd41988679ddb2dbc77e757b39adfed63811dabf9b3065d2e"
         }
 }
+```
 
 where the reference is the transaction id from the registration.
 
@@ -162,6 +170,7 @@ A mechanism should exist which allows either the API developer, or the Node Oper
 
 This payload, is of course only binding if the API developer's wallet or Node Operator's wallet is used process the request
 
+```
 {
     "0":   {
                 "system": "croesus"
@@ -169,9 +178,9 @@ This payload, is of course only binding if the API developer's wallet or Node Op
                 ,"reference": "f098d5222e1be60bd41988679ddb2dbc77e757b39adfed63811dabf9b3065d2e"
             } 
 }
-"f098d5222e1be60bd41988679ddb2dbc77e757b39adfed63811dabf9b3065d2e"}
+```
 
-This esztablishes a protocol for two use cases:
+This establishes a protocol for two use cases:
 
 1) Gracefully informating the ecosystem that an API endpoint is no longer available
 2) Allowing developers who no longer have trust in a Node Operator to terminate the reporting of performance metrics
@@ -180,6 +189,7 @@ This esztablishes a protocol for two use cases:
 
 The reporting of metrics must be made by the Node Operator who created the registration, with the form of the report containing:
 
+```
 {
     "0":    {
                 "system": "croesus"
@@ -197,10 +207,10 @@ The reporting of metrics must be made by the Node Operator who created the regis
                                     ,"value": 31949520
                                 }
                             ]
-                ,"validation":  "//mydomain.com/dandelion/api/liqwidscore/v1/validate/4fg9f49gb2949b7g497g49g4294g2bg97vb9v49"
+                ,"validation":  "//mydomain.com/randomiser/v2/monitoring/4fg9f49gb2949b7g497g49g4294g2bg97vb9v49"
             }
 }
-
+```
 
 ### Structure - Verification
 
@@ -208,6 +218,7 @@ The protocol must include a mechanism for End Users and the broader community to
 
 Verification reports must be sent to an arbitrator with a verified identity (via DID or other mechnism for review)
 
+```
 {
     "0":    {
                 "system": "croesus"
@@ -215,12 +226,13 @@ Verification reports must be sent to an arbitrator with a verified identity (via
                 ,"reference": "f48fh8440f88cb402804242"
             }
 }
-
+```
 
 ### Structure - Investigation
 
 Verification reports should include a paired investigation which can assess whether verifications of reports are valid or invalid. These investigations 
 
+```
 {
     "0":    {
                 "system": "croesus"
@@ -237,3 +249,4 @@ Verification reports should include a paired investigation which can assess whet
                                 ]
             }
 }
+```
