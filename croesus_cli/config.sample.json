@@ -1,0 +1,16 @@
+{
+    "publish": {
+        "vendor": "IPFS"
+        ,"authentication": ""
+        ,"location": ""
+    }
+    ,"metrics": [
+        "request_count"
+        ,"bucket_distribution"
+    ]
+    ,"croesus": {
+        "private_key_file": ""
+        ,"wallet_file": ""
+        ,"cardano_cli": ""
+    }
+}

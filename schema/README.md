@@ -6,7 +6,7 @@ Create a standards-based structure for the registration and assessment of automa
 
 ## Investigate
 
-Extend the schema.org SolveMathAction and MathSolver schemas
+What are the elements necessary to track performance of oracles that serve a decentralised ecosystem?
 
 ## Results
 
@@ -23,29 +23,34 @@ The example structure which we will pursue with this project is:
 }
 ```
 
-The Cardano meta data calls for a leaner standard compared with what schema.org has proposed.
+The Cardano meta data calls for a leaner standard compared with what schema.org has proposed for example.
 
-We will instead target this leaner standard, which is domain-specific to our purpose.
+We have instead target a leaner standard, which is domain-specific to our purpose.
 
 ## Workflow
+
+
+[image]
 
 ### Actors
 
 API Developer
 
-Creates an application which solves a problem, or addresses some need.
+Creates an service which solves a problem, or addresses some need.
 
 Node Operator
 
-Pays the API some licence fee to host their application and charges End Users for requests
+Hosts a service on behalf of the API Developer
+Contract to do so made between API Developer and Node Operator subject to their own agreement.
 
 End User
 
-Uses the application to solve their problem
+Uses the service to solve their problem
+Contract to do so made between Node Operator and End User
 
 ### Process
 
-An API developer creates an application which returns a random number. The API exposes the following simple endpoints:
+An API developer creates a service which returns a random number. The API exposes the following simple endpoints:
 
 GET /random
 
@@ -55,7 +60,7 @@ which returns values like:
 { "uuid": "200505-AE62-44ABB-83AFD", "value": 0.83028 }
 ```
 
-The application also comes bundled with an aggregator script which aggregates logged records into metrics relevant to the application.
+The service also comes bundled with an croesus aggregator script which aggregates logged records into metrics relevant to the application.
 
 During execution the application emits a log line of the returned value to standard out, which can be captured by an application log.
 
@@ -70,12 +75,13 @@ The Node operator maintains this application with a configuration file which spe
 
 * How often to run the log rotation
 * Where to publish the collated response file
+* What is the keyfile used to sign metadata transactions
 
-The Node operator is incentivised to do this because it provides some value-added features to their node, the Node Operator can seel access to the API to end users and offer discounts to End Users who stake with them.
+The Node operator is incentivised to do this because it provides some value-added features to their node, the Node Operator can sell access to the API to end users and offer discounts to End Users who stake with them.
 
 End Users enters into a contract with the Node Operator to access API, and can assess the performance of the service by querying the Croesus metadata stored on the Cardano blockchain
 
-### Metadata - Registration
+### Metadata - Application Registration
 
 ```
 {
@@ -88,14 +94,33 @@ End Users enters into a contract with the Node Operator to access API, and can a
         {
             "name": "Randomiser"
             ,"purpose": "Produce Random Numbers Between 0 and 1"
+            ,"codebase": "github.//"
+            ,"metrics": ["distribution"]
+            ,"specification": "A reference to the specification of this service. eg) IPFS file which species input data, output schema and outcome / reference and sample data to validate model. Left vague on purpose to support many types of services"
+        }
+}
+```
+
+This transaction is made out to the API developer's wallet, registers an application which can be sold on a marketplace to an API hoster.
+
+This will result in a transaction id being created
+
+"f4h29f942b9vb9v9vb89b89b89vb24"
+
+### Metadata - Offering
+
+```
+{
+    "0":
+        {
+            "system": "croesus"
+            ,"type": "offering"
+            ,"registration": "f4h29f942b9vb9v9vb89b89b89vb24" // a reference to the service registration metadata
+        }
+    "1":
+        {
             ,"version": "1.00"
             ,"endpoint": "//mydomain.com/randomiser/v1/random"
-            ,"specification": "//randomiser.com"
-            ,"reporting":
-                {
-                    "endpoint": "//mydomain.com/randomiser/v1/monitoring"
-                    ,"metrics": ["requests","distribution"]
-                }
         }
 }
 ```
@@ -111,21 +136,13 @@ eg)
     "0":
         {
             "system": "croesus"
-            ,"type": "registration"
-            ,"reference": "r43fh9fvh4v4v45g35rh5g3hg53g35"
+            ,"type": "offering"
+            ,"registration": "f4h29f942b9vb9v9vb89b89b89vb24" // a reference to the service registration metadata
         }
     "1":
         {
-            "name": "Randomiser"
-            ,"purpose": "Produce Random Numbers Between 0 and 1"
             ,"version": "2.00"
-            ,"endpoint": "//mydomain.com/randomiser/v2/random"
-            ,"specification": "//randomiser.com"
-            ,"reporting":
-                {
-                    "endpoint": "//mydomain.com/randomiser/v2/monitoring"
-                    ,"metrics": ["requests","distribution"]
-                }
+            ,"endpoint": "//mydomain.com/randomiser/v1/random"
         }
 }
 ```
@@ -138,13 +155,15 @@ This will result in a transaction id being created
 
 ### Structure - Confirmation
 
-There is now a requirement for the API developer to verify that the registration is valid.
+There is an optional step for an API developer to verify that the registration is valid.
+
+This operates something like a certification which can be filtered out when aggregating results.
+
+Perhaps only those performance metrics which have been certified are worthwhile
 
 They can confirm this by creating another transaction sent back to the Node Operator's wallet.
 
 This pair of transactions - a registration and follow up confirmation - establishes confidence that the service is trustworthy and aligned with developer expectations.
-
-Only registrations which have a paired confirmation will be aggregateed when assessing the application's performance.
 
 Confirmation meta data takes the form:
 
@@ -153,7 +172,7 @@ Confirmation meta data takes the form:
     "0": {
             "system": "croesus"
             ,"type": "confirmation"
-            ,"reference": "aaaad5222e1be60bd41988679ddb2dbc77e757b39adfed63811dabf9b3065d2e"
+            ,"offering": "aaaad5222e1be60bd41988679ddb2dbc77e757b39adfed63811dabf9b3065d2e"
         }
 }
 ```
@@ -168,7 +187,8 @@ This will result in a transaction id being created, which either wallet can refe
 
 A mechanism should exist which allows either the API developer, or the Node Operator to indicate the service is terminated
 
-This payload, is of course only binding if the API developer's wallet or Node Operator's wallet is used process the request
+This payload, is of course only binding if the API developer's wallet or Node Operator's wallet is used process the request. Any layer which aggregates this data should understand this distinction, otherwise anyone could specify
+termination requests.
 
 ```
 {
@@ -200,7 +220,7 @@ The reporting of metrics must be made by the Node Operator who created the regis
                 "metrics":  [
                                 {
                                     "name": "distribution"
-                                    ,"value": 100.0
+                                    ,"value": 93.4
                                 }
                                 ,{
                                     "name": "requests"
@@ -224,13 +244,15 @@ Verification reports must be sent to an arbitrator with a verified identity (via
                 "system": "croesus"
                 ,"type": "verification"
                 ,"reference": "f48fh8440f88cb402804242"
+                ,"complaint": "I ran a scoring request lasy may with UUID of fdsfds when i check the logs it is;t ther"
             }
 }
 ```
 
 ### Structure - Investigation
 
-Verification reports should include a paired investigation which can assess whether verifications of reports are valid or invalid. These investigations 
+Verification reports should include a paired investigation which can assess whether verifications of reports are valid or invalid. The nature of verifications and investigations is included in this protocol for completeness, although the form these determinations take is left up to eahc individual service to determine.
+
 
 ```
 {
